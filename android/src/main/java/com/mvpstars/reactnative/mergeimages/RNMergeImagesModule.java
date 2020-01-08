@@ -150,6 +150,66 @@ public class RNMergeImagesModule extends ReactContextBaseJavaModule {
     }
   }
 
+  @ReactMethod
+  public void mergeSideBySide(final ReadableArray images, final ReadableMap options, final Promise promise) {
+    new MergeSideBySideAsyncTask(images, options, promise).execute();
+  }
+
+  private class MergeSideBySideAsyncTask extends AsyncTask<Void, Void, Void> {
+    private final ReadableArray images;
+    private final ReadableMap options;
+    private final Promise promise;
+
+    public MergeSideBySideAsyncTask(final ReadableArray images, final ReadableMap options, final Promise promise) {
+      this.images = images;
+      this.options = options;
+      this.promise = promise;
+    }
+
+    @Override
+    protected Void doInBackground(Void... voids) {
+      final int size = options.hasKey("size") ? options.getInt("size") : RN_MERGE_SIZE_SMALLEST;
+      final int target = options.hasKey("target") ? options.getInt("target") : RN_MERGE_TARGET_TEMP;
+      final int jpegQuality = options.hasKey("jpegQuality") ? options.getInt("jpegQuality") : DEFAULT_JPEG_QUALITY;
+
+      final ArrayList<BitmapMetadata> bitmaps = new ArrayList<>(images.size());
+      int targetWidth, targetHeight;
+
+      targetWidth = 1;
+      targetHeight = 1;
+
+      for (int i = 0, n = images.size(); i < n; i++) {
+        BitmapMetadata bitmapMetadata = BitmapMetadata.load(getFilePath(images.getString(i)));
+        if (bitmapMetadata != null) {
+          bitmaps.add(bitmapMetadata);
+          if (bitmapMetadata.height > targetHeight) {
+            targetHeight = bitmapMetadata.height;
+          }
+          targetWidth = targetWidth + bitmapMetadata.width;
+        }
+      }
+
+      final Bitmap mergedBitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888);
+      final Canvas canvas = new Canvas(mergedBitmap);
+      float left = 0;
+      float top = 0;
+      for (BitmapMetadata bitmapMetadata: bitmaps) {
+        Bitmap bitmap = BitmapFactory.decodeFile(bitmapMetadata.fileName);
+        Matrix matrix = bitmapMetadata.getMatrix(targetWidth, targetHeight);
+        if (matrix == null) {
+          canvas.drawBitmap(bitmap, null, new RectF(left, top, targetWidth, targetHeight), null);
+        } else {
+          canvas.drawBitmap(bitmap, matrix, null);
+        }
+        left = left + bitmapMetadata.width;
+        bitmap.recycle();
+      }
+
+      saveBitmap(mergedBitmap, target, jpegQuality, promise);
+      return null;
+    }
+  }
+
   private static String getFilePath(String file) {
     try {
       final String uriPath = Uri.parse(file).getPath();
