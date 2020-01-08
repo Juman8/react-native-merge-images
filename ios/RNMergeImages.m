@@ -75,4 +75,51 @@ RCT_EXPORT_METHOD(merge:(NSArray *)imagePaths
     resolve(@{@"path":imagePath, @"width":[NSNumber numberWithFloat:newImage.size.width], @"height":[NSNumber numberWithFloat:newImage.size.height]});
 }
 
+
+RCT_EXPORT_METHOD(mergeSizeBySize:(NSArray *)imagePaths
+                  options:(NSDictionary *)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+
+    NSMutableArray *images = [@[] mutableCopy];
+    CGSize contextSize = CGSizeMake(0, 0);
+    CGFloat contextHeight = 0;
+    CGFloat contextWidth = 0;
+    
+    for (id tempObject in imagePaths) {
+        NSURL *URL = [RCTConvert NSURL:tempObject];
+        NSData *imgData = [[NSData alloc] initWithContentsOfURL:URL];
+        if (imgData != nil)
+        {
+            UIImage *image = [[UIImage alloc] initWithData:imgData];
+            [images addObject:image];
+
+            CGFloat width = image.size.width;
+            CGFloat height = image.size.height;
+            if (height > contextHeight) {
+                contextHeight = height;
+            }
+            contextWidth = contextWidth + width;
+        }
+    }
+
+    contextSize = CGSizeMake(contextWidth, contextHeight);
+    // create context with size
+    UIGraphicsBeginImageContext(contextSize);
+    // loop through image array
+    CGFloat x = 0 ;
+    CGFloat y = 0;
+    for (UIImage *image in images) {
+        [image drawInRect:CGRectMake(x,y,image.size.width,contextSize.height)];
+        x = x + image.size.width;
+    }
+    // creating final image
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    // save final image in temp
+    NSString *imagePath = [self saveImage:newImage];
+    //resolve with image path
+    resolve(@{@"path":imagePath, @"width":[NSNumber numberWithFloat:newImage.size.width], @"height":[NSNumber numberWithFloat:newImage.size.height]});
+}
 @end
