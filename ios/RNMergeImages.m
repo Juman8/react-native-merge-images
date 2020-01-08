@@ -76,7 +76,7 @@ RCT_EXPORT_METHOD(merge:(NSArray *)imagePaths
 }
 
 
-RCT_EXPORT_METHOD(mergeSizeBySize:(NSArray *)imagePaths
+RCT_EXPORT_METHOD(mergeSideBySide:(NSArray *)imagePaths
                   options:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
