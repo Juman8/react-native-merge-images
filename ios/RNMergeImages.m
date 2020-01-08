@@ -20,6 +20,10 @@
 {
     return dispatch_get_main_queue();
 }
++ (BOOL)requiresMainQueueSetup
+{
+  return NO;
+}
 RCT_EXPORT_MODULE()
 
 - (NSDictionary *)constantsToExport
