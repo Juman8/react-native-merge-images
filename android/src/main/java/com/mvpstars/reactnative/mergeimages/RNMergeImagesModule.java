@@ -197,7 +197,7 @@ public class RNMergeImagesModule extends ReactContextBaseJavaModule {
         Bitmap bitmap = BitmapFactory.decodeFile(bitmapMetadata.fileName);
         Matrix matrix = bitmapMetadata.getMatrix(targetWidth, targetHeight);
         if (matrix == null) {
-          canvas.drawBitmap(bitmap, null, new RectF(left, top, targetWidth, targetHeight), null);
+          canvas.drawBitmap(bitmap, left, 0f, null);
         } else {
           canvas.drawBitmap(bitmap, matrix, null);
         }
