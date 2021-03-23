@@ -1,10 +1,12 @@
 {
   "name": "react-native-merge-images",
   "version": "0.1.0",
+  "summary": "A react-native module that can listen on orientation changing of device",
   "description": "Library to merge images into one",
+  "homepage": "https://github.com/Juman8/react-native-merge-images",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mvpstars/react-native-merge-images"
+    "url": "https://github.com/Juman8/react-native-merge-images.git"
   },
   "main": "src/index.js",
   "keywords": [
@@ -13,7 +15,13 @@
     "android",
     "image"
   ],
-  "author": "MVP stars*",
+  "author": {
+    "name": "MVP stars*",
+    "url": "https://github.com/mvpstars"
+  },
+  "bugs": {
+    "url": "https://github.com/mvpstars/react-native-merge-images/issues"
+  },
   "license": "MIT",
   "peerDependencies": {
     "react-native": ">=0.47.0",
